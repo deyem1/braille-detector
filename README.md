@@ -1,46 +1,61 @@
-# Brailledetector filnal
- A CNN approach to detect braille in an image
+# Braille Detector 👆📖
 
-The Braille detector is a group project for Artificial Intelligence coursework. The project aims to aid accessibility 
-of visually impaired individuals and aid integration into the society.
+Detects Braille in a photo or live camera feed, transcribes each character to text and reads it aloud. It was built to make printed Braille more accessible to sighted carers, teachers and family members of visually impaired people.
 
-# Braille Detection and Transcription
-The project uses convolutional neural network to recognize Braille characters from images and individually translates each braille character.
+> Group project for the Artificial Intelligence module, MSc AI & Data Science, Keele University.
 
-# Dataset
-The dataset is for the 
-braille detection is in my google drive which can be found at (https://drive.google.com/drive/folders/1vHuEg5pr3S8fvYu0RCi27C4NsFPrMV-x?usp=sharing)
-while the transcription dataset can be found in a public kaaggle dataset (https://www.kaggle.com/datasets/shanks0465/braille-character-dataset)
-The braille detection dataset consist of augmented braille images.
+## How it works
 
-# Installation
-To run successfully this project, you would need to install the dependencies found in requirements.txt file:
+```
+image / webcam frame
+        │
+        ▼
+┌───────────────────┐   bounding box   ┌──────────────────────┐   characters   ┌────────────┐
+│ Detection model   │ ───────────────▶ │ Transcription model  │ ─────────────▶ │ Text + TTS │
+│ (VGG16, transfer) │                  │ (CNN, per character) │                │  (gTTS)    │
+└───────────────────┘                  └──────────────────────┘                └────────────┘
+```
 
-# Usage
-To use this project, follow these steps:
+1. **Detection:** a VGG16-based model (transfer learning) finds the Braille region in the image.
+2. **Transcription:** a sequential CNN classifies each Braille cell into a letter.
+3. **Output:** the text is shown in a Streamlit web app and spoken with gTTS.
 
-Web app - Streamlit
-1. Clone the repository to your local machine
-2. Navigate to the project directory
-3. navigate and open main.py
-4. To run the file successfully, install the dependencies in the requirements.txt by entering [pip install -r requirements.txt] in the terminal
-5. Also in the terminal, enter and run the script using [streamlit run main.py]
-6. Ensure the trained Model (brailledetect2.h5) should be in the same folder  
-7. running the app, the app redirects to your local browser 
+## Run it
 
-Live tracker
-1. As above, ensure installation of the dependencies in the requirements.txt
-2. In a code editor, preferably pycharm, run the script.
-3. If the camera window does not pop up, change the following code:
-        # Starts camera
-        cap = cv2.VideoCapture(0) #<< change 0 to 1 or 2
+```bash
+git clone https://github.com/deyem1/braille-detector.git
+cd braille-detector
+pip install -r requirements.txt
 
+# Web app
+streamlit run main.py
 
-# Models
-A VGG16 model for braille detection and Sequential model for transcription which are in the Brai Detection - Copy.ipynb and
-Braille-character-transcription-cnn.ipynb respectively.
+# Live webcam tracker
+python "live tracker.py"   # if no camera opens, change cv2.VideoCapture(0) to 1 or 2
+```
 
-# Credits
-The Braille character dataset used in this project was obtained from Kaggle and https://github.com/IlyaOvodov/AngelinaDataset.
-The neural network architecture was inspired by https://github.com/nicknochnack/FaceDetection and
-  https://www.kaggle.com/code/amanrosekaursethi/braille-character-detection-using-cnn.
+The trained model `brailledetect2.h5` must sit in the project folder.
+
+## Project structure
+
+| File | Purpose |
+|---|---|
+| `main.py` | Streamlit web app |
+| `live tracker.py` | Real-time detection from a webcam |
+| `Brai Detection - Copy.ipynb` | Detection model training (VGG16) |
+| `Braille-character-transcription-cnn.ipynb` | Character classifier training |
+| `brailledetect*.h5` | Trained model weights |
+
+## Data
+
+- **Detection:** augmented Braille images ([Google Drive](https://drive.google.com/drive/folders/1vHuEg5pr3S8fvYu0RCi27C4NsFPrMV-x?usp=sharing)), partly from the [Angelina Braille Images Dataset](https://github.com/IlyaOvodov/AngelinaDataset)
+- **Transcription:** [Braille Character Dataset](https://www.kaggle.com/datasets/shanks0465/braille-character-dataset) (Kaggle)
+
+## Credits
+
+The detection architecture was inspired by [nicknochnack/FaceDetection](https://github.com/nicknochnack/FaceDetection), and the classifier by [this Kaggle notebook](https://www.kaggle.com/code/amanrosekaursethi/braille-character-detection-using-cnn).
+
+## Possible next steps
+
+- Transcribe whole lines and words, not just single characters
+- Export to TensorFlow Lite for on-device use on a phone
